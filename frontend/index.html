@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jurisly — Indian Legal Case Similarity Engine</title>
+<meta name="description" content="Find semantically similar Indian Supreme Court cases using AI. 35,000+ judgments from 1950–2025."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/main.css">
+
+/* ─── TOAST ───────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--ink); color: #fff; border-radius: var(--r2);
+  padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.25); font-size: 13.5px; max-width: 300px;
+  transform: translateY(60px); opacity: 0; pointer-events: none;
+  transition: all .28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.toast.show { transform: translateY(0); opacity: 1; pointer-events: all; }
+.toast-ico { font-size: 17px; }
+.toast-body strong { display: block; font-size: 13px; margin-bottom: 1px; }
+.toast-body span { font-size: 12px; opacity: .7; }
+
+/* ─── MODAL ───────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 500; background: rgba(30,27,24,.6);
+  backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: var(--ease);
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r3);
+  padding: 32px; width: 92%; max-width: 660px; max-height: 88vh; overflow-y: auto;
+  transform: scale(.96) translateY(10px); transition: var(--ease); box-shadow: var(--sh2);
+}
+.overlay.open .modal-box { transform: scale(1) translateY(0); }
+.modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+.modal-title { font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.modal-x { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; font-size: 13px; transition: var(--ease); display: flex; align-items: center; justify-content: center; }
+.modal-x:hover { color: var(--crimson); border-color: var(--crimson); }
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 1000px) {
+  .hero-wrap { grid-template-columns: 1fr; gap: 40px; }
+  .hero-card { display: none; }
+  .search-grid { grid-template-columns: 1fr; }
+  .input-panel { position: static; }
+  .pipeline { grid-template-columns: repeat(3,1fr); }
+  .ts-grid { grid-template-columns: repeat(2, 1fr); }
+  .data-grid { grid-template-columns: repeat(2, 1fr); }
+  .detail-grid, .cp-grid { grid-template-columns: 1fr; }
+  .footer-main { grid-template-columns: 1fr; text-align: center; }
+  .footer-col.right, .footer-col.center { text-align: center; }
+}
+@media (max-width: 680px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 60px 20px 0; }
+  .page-wrap { padding: 0 20px; }
+  .hero-stats { flex-wrap: wrap; gap: 16px; }
+  .pipeline { grid-template-columns: 1fr 1fr; }
+  .ts-grid { grid-template-columns: 1fr; }
+  .data-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ═══════════════════════════════════════ -->
+<nav>
+  <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <!-- Scales of Justice SVG Logo -->
+    <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="#1e1b18"/>
+      <!-- base -->
+      <rect x="18.5" y="8" width="3" height="23" rx="1.5" fill="#c4922a"/>
+      <!-- crossbar -->
+      <rect x="10" y="12.5" width="20" height="2.5" rx="1.25" fill="#c4922a"/>
+      <!-- left pan strings -->
+      <line x1="11" y1="15" x2="9" y2="22" stroke="#c4922a" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="14" y1="15" x2="16" y2="22" stroke="#c4922a" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- right pan strings -->
+      <line x1="26" y1="15" x2="24" y2="22" stroke="#e8a835" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="29" y1="15" x2="31" y2="22" stroke="#e8a835" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- pans -->
+      <path d="M7 22 Q12.5 25.5 18 22" stroke="#c4922a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <path d="M22 22 Q27.5 25.5 33 22" stroke="#e8a835" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <!-- base foot -->
+      <rect x="15" y="31" width="10" height="2.2" rx="1.1" fill="#c4922a"/>
+      <!-- decorative dot -->
+      <circle cx="20" cy="9.5" r="1.8" fill="#8b1a1a"/>
+    </svg>
+    <span class="logo-text">Juris<em>ly</em></span>
+  </div>
+
+  <div class="nav-links">
+    <a href="#search" class="nav-link" id="nl-search">Search</a>
+    <a href="#how" class="nav-link" id="nl-how">How it works</a>
+    <a href="#techstack" class="nav-link" id="nl-tech">Tech Stack</a>
+  </div>
+
+  <div class="nav-right">
+    <span class="kbd-hint" title="Press ⌘K to focus search" onclick="focusSearch()">⌘K</span>
+    <button class="btn-cta" onclick="document.getElementById('search').scrollIntoView({behavior:'smooth'})">Search Cases</button>
+  </div>
+</nav>
+
+<!-- ══ HERO ═══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-wrap">
+    <!-- Left -->
+    <div>
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        35,000+ Judgments · 1950 – 2025
+      </div>
+      <h1 class="hero-h1">
+        Precedent<br>discovery,<br><em>reimagined</em>
+      </h1>
+      <p class="hero-sub">
+        Jurisly uses a Python-based backend with BERT models to understand legal context and retrieve relevant case precedents using vector similarity search. Built specifically for Indian judicial language.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="focusSearch()">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="white" stroke-width="2"/><path d="M14 14l4 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          Find Similar Cases
+        </button>
+        <button class="btn-outline" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-n">35<em>K+</em></span><span class="stat-l">Judgments</span></div>
+        <div class="stat"><span class="stat-n">75<em> yrs</em></span><span class="stat-l">Coverage</span></div>
+        <div class="stat"><span class="stat-n">BERT</span><span class="stat-l">AI Model</span></div>
+        <div class="stat"><span class="stat-n">~0.3<em>s</em></span><span class="stat-l">Query Time</span></div>
+      </div>
+    </div>
+
+    <!-- Right: Live preview card -->
+    <div class="hero-card">
+      <div class="hc-top">
+        <span class="hc-label">Live Preview</span>
+        <span class="hc-status">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block"></span>
+          Active
+        </span>
+      </div>
+      <textarea class="hc-textarea" id="heroText"
+        placeholder="Paste legal text here…&#10;&#10;e.g. The petitioner challenges the constitutional validity of an amendment affecting fundamental rights under Articles 14, 19 and 21. It is contended the basic structure doctrine prohibits such encroachment…"
+      ></textarea>
+      <div class="hc-progress" id="hcProg"><div class="hc-progress-fill" id="hcFill"></div></div>
+      <div class="hc-bar-label" id="hcLbl"></div>
+      <div class="hc-foot">
+        <span class="hc-count" id="hcCount">0 chars</span>
+        <button class="hc-run" id="hcBtn" onclick="heroRun()">
+          Analyze →
+        </button>
+      </div>
+      <div class="hc-results" id="hcResults"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ════════════════════════════════ -->
+<section id="how">
+  <div class="page-wrap" style="padding-top:80px;padding-bottom:80px">
+    <div class="section-head">
+      <div class="section-eye">System Pipeline</div>
+      <h2 class="section-h">Seven-stage case<br><span>matching pipeline</span></h2>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-n">01</div>
+        <span class="pipe-ico">📥</span>
+        <div class="pipe-title">Document Input</div>
+        <div class="pipe-desc">Accept legal documents via text paste, file upload, or case citation lookup.</div>
+        <div class="pipe-tags"><span class="pipe-tag">PDF</span><span class="pipe-tag">TXT</span><span class="pipe-tag">DOCX</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">02</div>
+        <span class="pipe-ico">🔤</span>
+        <div class="pipe-title">Text Processing</div>
+        <div class="pipe-desc">Clean and structure raw legal text, removing noise while preserving judicial terminology.</div>
+        <div class="pipe-tags"><span class="pipe-tag">Python</span><span class="pipe-tag">NLP</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">03</div>
+        <span class="pipe-ico">🧠</span>
+        <div class="pipe-title">Context Understanding</div>
+        <div class="pipe-desc">BERT model reads and understands the meaning and legal context of the input text.</div>
+        <div class="pipe-tags"><span class="pipe-tag">BERT</span><span class="pipe-tag">AI</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">04</div>
+        <span class="pipe-ico">🗄️</span>
+        <div class="pipe-title">Vector Storage</div>
+        <div class="pipe-desc">Processed case data and representations are stored in a structured database for retrieval.</div>
+        <div class="pipe-tags"><span class="pipe-tag">MongoDB</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">05</div>
+        <span class="pipe-ico">⚡</span>
+        <div class="pipe-title">FAISS Indexing</div>
+        <div class="pipe-desc">High-speed vector indexing enables efficient search across thousands of case records.</div>
+        <div class="pipe-tags"><span class="pipe-tag">FAISS</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">06</div>
+        <span class="pipe-ico">🔗</span>
+        <div class="pipe-title">Case Matching</div>
+        <div class="pipe-desc">Identify the most relevant legal precedents based on contextual similarity and case relevance.</div>
+        <div class="pipe-tags"><span class="pipe-tag">Matching</span><span class="pipe-tag">Ranking</span></div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">07</div>
+        <span class="pipe-ico">📊</span>
+        <div class="pipe-title">Ranked Results</div>
+        <div class="pipe-desc">Present top matching cases with relevance scores, metadata, and key legal provisions.</div>
+        <div class="pipe-tags"><span class="pipe-tag">Flask</span><span class="pipe-tag">API</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TECH STACK ═════════════════════════════════════ -->
+<section id="techstack">
+  <div class="page-wrap" style="padding-top:80px;padding-bottom:80px">
+    <div class="section-head">
+      <div class="section-eye">Technology</div>
+      <h2 class="section-h">Built with <span>modern tools</span></h2>
+      <p class="section-sub">A robust stack designed for accurate case matching and faster legal research.</p>
+    </div>
+    <div class="ts-grid">
+      <div class="ts-card">
+        <span class="ts-ico">🌐</span>
+        <div class="ts-label">Frontend</div>
+        <div class="ts-name">HTML, CSS, JavaScript</div>
+        <div class="ts-desc">Clean, responsive interface for seamless interaction with the case search engine.</div>
+      </div>
+      <div class="ts-card">
+        <span class="ts-ico">⚙️</span>
+        <div class="ts-label">Backend</div>
+        <div class="ts-name">Python (Flask / FastAPI)</div>
+        <div class="ts-desc">Handles API requests, orchestrates the AI pipeline, and serves results efficiently.</div>
+      </div>
+      <div class="ts-card">
+        <span class="ts-ico">🧠</span>
+        <div class="ts-label">AI / NLP</div>
+        <div class="ts-name">BERT</div>
+        <div class="ts-desc">Deep context understanding of legal text for accurate case matching and precedent discovery.</div>
+      </div>
+      <div class="ts-card">
+        <span class="ts-ico">🗄️</span>
+        <div class="ts-label">Database</div>
+        <div class="ts-name">MongoDB</div>
+        <div class="ts-desc">Stores case text, metadata, and processed representations for structured retrieval.</div>
+      </div>
+      <div class="ts-card">
+        <span class="ts-ico">⚡</span>
+        <div class="ts-label">Similarity Search</div>
+        <div class="ts-name">FAISS</div>
+        <div class="ts-desc">Facebook AI Similarity Search for fast vector indexing and retrieval across large datasets.</div>
+      </div>
+      <div class="ts-card">
+        <span class="ts-ico">📚</span>
+        <div class="ts-label">Data</div>
+        <div class="ts-name">Indian Supreme Court Judgments</div>
+        <div class="ts-desc">35,000+ judgments spanning 1950–2025, sourced from publicly available legal databases.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SEARCH ENGINE ════════════════════════════════ -->
+<section id="search">
+  <div class="page-wrap" style="padding-top:80px;padding-bottom:100px">
+    <div class="section-head">
+      <div class="section-eye">Similarity Engine</div>
+      <h2 class="section-h">Search <span>precedents</span></h2>
+      <p class="section-sub">Paste judgment text, upload a document, or enter a citation. Saved cases and compare mode available.</p>
+    </div>
+
+    <div class="search-grid">
+
+      <!-- ── Input Panel ── -->
+      <div class="input-panel">
+        <div class="tabs">
+          <button class="tab-btn on" onclick="switchTab('text',this)">✏ Paste</button>
+          <button class="tab-btn" onclick="switchTab('upload',this)">📄 Upload</button>
+          <button class="tab-btn" onclick="switchTab('cite',this)">🔗 Citation</button>
+        </div>
+
+        <!-- Text -->
+        <div id="tab-text">
+          <textarea class="text-input" id="mainText" autofocus
+            placeholder="Paste legal text, judgment facts or issues here…&#10;&#10;Example: The petitioner challenges the constitutional validity of the 42nd Amendment Act. It is contended that the basic structure doctrine established in Kesavananda Bharati prohibits Parliament from exercising unlimited amending power under Article 368…"
+          ></textarea>
+          <div style="padding:6px 14px 10px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:11px;color:var(--quiet);font-family:var(--mono)" id="charCount">0 chars</span>
+            <button style="font-size:11px;color:var(--crimson);background:none;border:none;cursor:pointer;font-family:var(--sans)" onclick="loadSample()">Load sample →</button>
+          </div>
+        </div>
+
+        <!-- Upload -->
+        <div id="tab-upload" style="display:none">
+          <div class="upload-area" id="dropZone"
+            ondragover="doDragOver(event)" ondragleave="doDragLeave(event)" ondrop="doDrop(event)"
+            onclick="document.getElementById('fileInput').click()">
+            <div class="upload-ico">📁</div>
+            <div class="upload-txt">Drop file here or click to browse</div>
+            <div class="upload-sub">Supports PDF · TXT · DOCX</div>
+            <div class="fmt-row"><span class="fmt">.pdf</span><span class="fmt">.txt</span><span class="fmt">.docx</span></div>
+          </div>
+          <input type="file" id="fileInput" accept=".pdf,.txt,.docx" style="display:none" onchange="handleFile(event)"/>
+        </div>
+
+        <!-- Citation -->
+        <div id="tab-cite" style="display:none">
+          <div class="cite-body">
+            <input class="cite-input" id="citeInput" type="text" placeholder="e.g. AIR 1973 SC 1461 or Kesavananda Bharati v. State of Kerala"/>
+            <div class="cite-hint">Supports: AIR citations · case names · CNR numbers</div>
+            <div class="quick-row">Landmark Cases</div>
+            <div class="qc-item" onclick="setQuickCite(this)">Kesavananda Bharati v. State of Kerala — AIR 1973 SC 1461</div>
+            <div class="qc-item" onclick="setQuickCite(this)">Maneka Gandhi v. Union of India — AIR 1978 SC 597</div>
+            <div class="qc-item" onclick="setQuickCite(this)">S.R. Bommai v. Union of India — AIR 1994 SC 1918</div>
+            <div class="qc-item" onclick="setQuickCite(this)">Vishaka v. State of Rajasthan — AIR 1997 SC 3011</div>
+            <div class="qc-item" onclick="setQuickCite(this)">A.K. Gopalan v. State of Madras — AIR 1950 SC 27</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <span class="filter-label">Filters</span>
+          <select class="fsel" id="fYear">
+            <option value="">All Years</option>
+            <option value="1950-1980">1950–1980</option>
+            <option value="1981-2000">1981–2000</option>
+            <option value="2001-2015">2001–2015</option>
+            <option value="2016-2025">2016–2025</option>
+          </select>
+          <select class="fsel" id="fType">
+            <option value="">All Types</option>
+            <option value="Constitutional">Constitutional</option>
+            <option value="Criminal">Criminal Law</option>
+            <option value="Civil">Civil Law</option>
+            <option value="Federalism">Federalism</option>
+            <option value="Fundamental Rights">Fundamental Rights</option>
+          </select>
+          <select class="fsel" id="fTop">
+            <option value="5">Top 5</option>
+            <option value="10" selected>Top 10</option>
+            <option value="20">Top 20</option>
+          </select>
+        </div>
+
+        <!-- Method chips -->
+        <div class="filter-bar" style="gap:6px;padding-top:8px">
+          <span class="filter-label">Methods</span>
+          <div class="toggle-chip on" onclick="this.classList.toggle('on')">BERT</div>
+          <div class="toggle-chip on" onclick="this.classList.toggle('on')">FAISS</div>
+          <div class="toggle-chip" onclick="this.classList.toggle('on')">Citation Lookup</div>
+        </div>
+
+        <div class="panel-foot">
+          <div class="saved-count">
+            <span>🔖</span>
+            <span id="savedCountText">0 saved</span>
+            <button class="saved-btn" id="viewSavedBtn" onclick="toggleSaved()" style="display:none">View</button>
+          </div>
+          <button class="run-btn" id="runBtn" onclick="runSearch()">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="white" stroke-width="2"/><path d="M14 14l4 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            Find Similar
+          </button>
+        </div>
+        <div class="ip-prog" id="ipProg"><div class="ip-prog-fill" id="ipFill"></div></div>
+      </div>
+
+      <!-- ── Results Panel ── -->
+      <div class="results-wrap">
+
+        <!-- Saved Cases Panel -->
+        <div class="saved-panel" id="savedPanel">
+          <div class="sp-head">
+            <span class="sp-title">Saved Cases</span>
+            <button class="sp-clear" onclick="clearSaved()">Clear all</button>
+          </div>
+          <div class="saved-list" id="savedList"></div>
+        </div>
+
+        <!-- Compare Panel -->
+        <div class="compare-panel" id="comparePanel">
+          <div class="cp-head">
+            <span class="cp-title">Case Comparison</span>
+            <button class="cp-close" onclick="closeCompare()">✕</button>
+          </div>
+          <div class="cp-grid" id="compareGrid">
+            <div class="cp-empty">Select a case to compare →</div>
+            <div class="cp-empty">Select another case →</div>
+          </div>
+        </div>
+
+        <!-- Top bar -->
+        <div class="res-top-bar" id="resTopBar">
+          <div class="res-meta-text" id="resMetaText"></div>
+          <div class="res-controls">
+            <select class="sort-sel" onchange="sortResults(this.value)">
+              <option value="score">Sort: Similarity</option>
+              <option value="year-d">Year: Newest</option>
+              <option value="year-a">Year: Oldest</option>
+            </select>
+            <button class="compare-btn" id="compareToggleBtn" onclick="toggleCompareMode()">⚖ Compare</button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-ico">⚖️</div>
+          <div class="empty-title">Ready to search</div>
+          <div class="empty-sub">Enter legal text or a case citation on the left, then click <strong>Find Similar</strong> to discover precedents.</div>
+        </div>
+
+        <!-- Skeleton -->
+        <div id="skelContainer" style="display:none">
+          <div class="skel-card"><div style="display:flex;gap:14px"><div class="skel" style="width:54px;height:54px;border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div class="skel" style="height:14px;width:66%;margin-bottom:10px"></div><div class="skel" style="height:18px;width:38%;border-radius:100px;margin-bottom:11px"></div><div class="skel" style="height:12px;margin-bottom:6px"></div><div class="skel" style="height:12px;width:78%"></div></div></div></div>
+          <div class="skel-card" style="margin-top:12px"><div style="display:flex;gap:14px"><div class="skel" style="width:54px;height:54px;border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div class="skel" style="height:14px;width:55%;margin-bottom:10px"></div><div class="skel" style="height:18px;width:44%;border-radius:100px;margin-bottom:11px"></div><div class="skel" style="height:12px;margin-bottom:6px"></div><div class="skel" style="height:12px;width:82%"></div></div></div></div>
+          <div class="skel-card" style="margin-top:12px"><div style="display:flex;gap:14px"><div class="skel" style="width:54px;height:54px;border-radius:50%;flex-shrink:0"></div><div style="flex:1"><div class="skel" style="height:14px;width:72%;margin-bottom:10px"></div><div class="skel" style="height:18px;width:35%;border-radius:100px;margin-bottom:11px"></div><div class="skel" style="height:12px;margin-bottom:6px"></div><div class="skel" style="height:12px;width:65%"></div></div></div></div>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DATA & SCALABILITY ═══════════════════════════ -->
+<section id="data">
+  <div class="page-wrap" style="padding-top:80px;padding-bottom:80px">
+    <div class="section-head">
+      <div class="section-eye">Infrastructure</div>
+      <h2 class="section-h">Data & <span>Scalability</span></h2>
+      <p class="section-sub">Engineered to handle the demands of large-scale Indian legal research.</p>
+    </div>
+    <div class="data-grid">
+      <div class="data-card">
+        <span class="data-ico">🏛️</span>
+        <div class="data-title">Large-Scale Legal Data</div>
+        <div class="data-desc">Handles tens of thousands of Indian Supreme Court judgments spanning over seven decades.</div>
+      </div>
+      <div class="data-card">
+        <span class="data-ico">🗂️</span>
+        <div class="data-title">Structured Storage</div>
+        <div class="data-desc">Stores case text, metadata, judges, and provisions in an organized, queryable format.</div>
+      </div>
+      <div class="data-card">
+        <span class="data-ico">🚀</span>
+        <div class="data-title">Fast Retrieval</div>
+        <div class="data-desc">Uses vector indexing to deliver accurate results in under a second, even across large datasets.</div>
+      </div>
+      <div class="data-card">
+        <span class="data-ico">📈</span>
+        <div class="data-title">Designed to Scale</div>
+        <div class="data-desc">Architecture supports efficient search across thousands of cases with minimal latency.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-main">
+    <div class="footer-col">
+      <div class="footer-brand">
+        <svg width="22" height="22" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#1e1b18"/><rect x="18.5" y="8" width="3" height="23" rx="1.5" fill="#c4922a"/><rect x="10" y="12.5" width="20" height="2.5" rx="1.25" fill="#c4922a"/><line x1="11" y1="15" x2="9" y2="22" stroke="#c4922a" stroke-width="1.2" stroke-linecap="round"/><line x1="14" y1="15" x2="16" y2="22" stroke="#c4922a" stroke-width="1.2" stroke-linecap="round"/><line x1="26" y1="15" x2="24" y2="22" stroke="#e8a835" stroke-width="1.2" stroke-linecap="round"/><line x1="29" y1="15" x2="31" y2="22" stroke="#e8a835" stroke-width="1.2" stroke-linecap="round"/><path d="M7 22 Q12.5 25.5 18 22" stroke="#c4922a" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M22 22 Q27.5 25.5 33 22" stroke="#e8a835" stroke-width="1.4" fill="none" stroke-linecap="round"/><rect x="15" y="31" width="10" height="2.2" rx="1.1" fill="#c4922a"/></svg>
+        <span class="footer-brand-text">Juris<em>ly</em></span>
+      </div>
+      Jurisly — AI-powered legal case similarity system
+    </div>
+    <div class="footer-col center">
+      Built using Python, BERT, FAISS, and modern web technologies
+    </div>
+    <div class="footer-col right">
+      Made with ❤️ for smarter legal research
+    </div>
+  </div>
+  <div class="footer-bottom">
+    Developed as part of academic work in AI and Data Science
+  </div>
+</footer>
+
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-ico" id="toastIco"></span>
+  <div class="toast-body"><strong id="toastTitle"></strong><span id="toastSub"></span></div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeOverlay()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modalTitle"></span>
+      <button class="modal-x" onclick="closeOverlay()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ══ CASE DATA ════════════════════════════════════ */
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/search.js"></script>
+
+function toggleSaved() {
+  const panel = document.getElementById('savedPanel');
+  panel.classList.toggle('show');
+  renderSavedList();
+}
+
+/* ══ COMPARE MODE ═════════════════════════════════ */
+function toggleCompareMode() {
+  compareMode = !compareMode;
+  const btn = document.getElementById('compareToggleBtn');
+  btn.classList.toggle('active', compareMode);
+  btn.textContent = compareMode ? '⚖ Exit Compare' : '⚖ Compare';
+  compareCases = [];
+  document.getElementById('comparePanel').classList.remove('show');
+  reRenderResults();
+  if (compareMode) showToast('⚖','Compare mode','Select 2 cases to compare side by side');
+}
+
+function toggleCompareCase(id, btn) {
+  const idx = compareCases.indexOf(id);
+  if (idx !== -1) {
+    compareCases.splice(idx, 1);
+    btn.textContent = '+ Compare'; btn.classList.remove('primary');
+    const card = document.querySelector(`.result-card[data-id="${id}"]`);
+    if (card) card.classList.remove('compare-selected');
+  } else {
+    if (compareCases.length >= 2) { showToast('⚠','Max 2','You can only compare 2 cases at a time'); return; }
+    compareCases.push(id);
+    btn.textContent = '✓ Selected'; btn.classList.add('primary');
+    const card = document.querySelector(`.result-card[data-id="${id}"]`);
+    if (card) card.classList.add('compare-selected');
+  }
+  if (compareCases.length === 2) renderComparison();
+}
+
+function renderComparison() {
+  const panel = document.getElementById('comparePanel');
+  const grid = document.getElementById('compareGrid');
+  panel.classList.add('show');
+  const cases = compareCases.map(id => CASES.find(c => c.id === id));
+  grid.innerHTML = cases.map(c => `
+    <div class="cp-case">
+      <div class="cp-case-title">${c.title}</div>
+      <div class="cp-row"><span class="cp-row-k">Year</span><span class="cp-row-v">${c.year}</span></div>
+      <div class="cp-row"><span class="cp-row-k">Citation</span><span class="cp-row-v" style="font-family:var(--mono);font-size:11px">${c.cit}</span></div>
+      <div class="cp-row"><span class="cp-row-k">Type</span><span class="cp-row-v">${c.type}</span></div>
+      <div class="cp-row"><span class="cp-row-k">Bench</span><span class="cp-row-v">${c.bench} judges</span></div>
+      <div class="cp-row"><span class="cp-row-k">Author</span><span class="cp-row-v">${c.author}</span></div>
+      <div class="cp-row"><span class="cp-row-k">Disposal</span><span class="cp-row-v">${c.disp}</span></div>
+      <div class="cp-row"><span class="cp-row-k">Similarity</span><span class="cp-row-v" style="color:var(--gold)">${Math.round(c.score*100)}%</span></div>
+      <div class="cp-row"><span class="cp-row-k">Text Relevance</span><span class="cp-row-v">${Math.round(c.tfidf*100)}%</span></div>
+      <div class="cp-row"><span class="cp-row-k">Context Match</span><span class="cp-row-v">${Math.round(c.bert*100)}%</span></div>
+    </div>`).join('');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeCompare() {
+  document.getElementById('comparePanel').classList.remove('show');
+  compareCases = [];
+  compareMode = false;
+  document.getElementById('compareToggleBtn').classList.remove('active');
+  document.getElementById('compareToggleBtn').textContent = '⚖ Compare';
+  reRenderResults();
+}
+
+function reRenderResults() {
+  const list = document.getElementById('resultsList');
+  if (!list.innerHTML) return;
+  list.innerHTML = '';
+  CASES.forEach((c, i) => renderResult(c, i));
+}
+
+/* ══ MODAL ════════════════════════════════════════ */
+function openModal(id) {
+  const c = CASES.find(x => x.id === id);
+  document.getElementById('modalTitle').textContent = c.title;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px">
+      <span class="pill p-cit">${c.cit}</span>
+      <span class="pill p-yr">${c.year}</span>
+      <span class="pill p-tp">${c.type}</span>
+    </div>
+    <div class="detail-grid" style="margin-bottom:14px">
+      <div class="d-block">
+        <div class="d-head">Parties</div>
+        <div class="d-row"><span class="d-k">Petitioner</span><span class="d-v">${c.pet}</span></div>
+        <div class="d-row"><span class="d-k">Respondent</span><span class="d-v">${c.res}</span></div>
+        <div class="d-row"><span class="d-k">Disposal</span><span class="d-v">${c.disp}</span></div>
+        <div class="d-row"><span class="d-k">Bench Size</span><span class="d-v">${c.bench} judges</span></div>
+        <div class="d-row"><span class="d-k">Author Judge</span><span class="d-v">${c.author}</span></div>
+      </div>
+      <div class="d-block">
+        <div class="d-head">Relevance Scores</div>
+        <div class="srow"><div class="slabel"><span>Text Relevance</span><span style="color:var(--gold)">${Math.round(c.tfidf*100)}%</span></div><div class="strack"><div class="sfill sf1" style="width:${Math.round(c.tfidf*100)}%"></div></div></div>
+        <div class="srow"><div class="slabel"><span>Context Understanding</span><span style="color:var(--teal)">${Math.round(c.bert*100)}%</span></div><div class="strack"><div class="sfill sf2" style="width:${Math.round(c.bert*100)}%"></div></div></div>
+        <div class="srow"><div class="slabel"><span>Citation Relevance</span><span style="color:#6366f1">${Math.round(c.graph*100)}%</span></div><div class="strack"><div class="sfill sf3" style="width:${Math.round(c.graph*100)}%"></div></div></div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between"><span style="color:var(--muted)">Combined Score</span><strong style="color:var(--crimson)">${Math.round(c.score*100)}%</strong></div>
+      </div>
+    </div>
+    <div class="seg-block" style="margin-bottom:16px">
+      <div class="seg-h">Matching Segments</div>
+      ${c.segs.map(s => `<div class="seg">${s}</div>`).join('')}
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="seg-h" style="margin-bottom:8px">Provisions Cited</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${c.acts.map(a => `<span class="act">${a}</span>`).join('')}</div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="seg-h" style="margin-bottom:8px">Full Bench</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">${c.judge.split('·').join('<br>')}</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
+      <button class="btn-primary" style="font-size:13px;padding:9px 18px" onclick="copyCit('${c.cit}')">📋 Copy Citation</button>
+      <button class="btn-outline" style="font-size:13px;padding:9px 18px" onclick="closeOverlay()">Close</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeOverlay() { document.getElementById('overlay').classList.remove('open'); }
+
+/* ══ UPLOAD ═══════════════════════════════════════ */
+function doDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+function doDragLeave() { document.getElementById('dropZone').classList.remove('drag'); }
+function doDrop(e) { e.preventDefault(); doDragLeave(); if (e.dataTransfer.files[0]) handleFile({ target: { files: e.dataTransfer.files } }); }
+function handleFile(e) {
+  const f = e.target.files[0];
+  document.getElementById('dropZone').innerHTML = `<div class="upload-ico">✅</div><div class="upload-txt">${f.name}</div><div class="upload-sub">${(f.size/1024).toFixed(1)} KB — ready to analyze</div>`;
+  showToast('📄','File ready', f.name);
+}
+
+/* ══ CITATION QUICKSET ════════════════════════════ */
+function setQuickCite(el) { document.getElementById('citeInput').value = el.textContent.trim(); }
+
+/* ══ TOAST ════════════════════════════════════════ */
+function showToast(ico, title, sub) {
+  document.getElementById('toastIco').textContent = ico;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastSub').textContent = sub;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+function copyCit(txt) { navigator.clipboard.writeText(txt).catch(()=>{}); showToast('📋','Copied!', txt); }
+
+/* ══ NAV SCROLL HIGHLIGHT ═════════════════════════ */
+window.addEventListener('scroll', () => {
+  const sy = scrollY;
+  ['search','how','tech'].forEach(id => {
+    const elId = id === 'tech' ? 'techstack' : id;
+    const el = document.getElementById(elId);
+    const link = document.getElementById('nl-' + id);
+    if (!el || !link) return;
+    const active = sy >= el.offsetTop - 120 && sy < el.offsetTop + el.offsetHeight - 120;
+    link.classList.toggle('active', active);
+  });
+});
+</script>
+</body>
+</html>

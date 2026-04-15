@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "title": "Kesavananda Bharati v. State of Kerala",
+    "petitioner": "Kesavananda Bharati",
+    "respondent": "State of Kerala",
+    "year": 1973,
+    "citation": "AIR 1973 SC 1461",
+    "disposal": "Dismissed (majority)",
+    "bench_size": 13,
+    "judges": "Y.V. Chandrachud · H.R. Khanna · K.S. Hegde · A.N. Ray · D.G. Palekar",
+    "author": "Y.V. Chandrachud",
+    "case_type": "Constitutional",
+    "snippet": "The <mark>basic structure doctrine</mark> holds that Parliament cannot amend the Constitution to <mark>destroy its fundamental identity</mark>. Article 368 grants wide amending power but not unlimited power.",
+    "segments": [
+      "The <mark>basic structure</mark> of the Constitution cannot be amended by Parliament — it is inviolable.",
+      "The <mark>amending power</mark> under Article 368 does not extend to altering or destroying the Constitution's essential features."
+    ],
+    "acts": ["Article 368", "Article 31C", "24th Amendment", "25th Amendment"],
+    "full_text": "His Holiness Kesavananda Bharati Sripadagalvaru, the head of Edneer Mutt, a religious institution in the State of Kerala, challenged the validity of the Kerala Land Reforms Act, 1963, as amended by the Kerala Land Reforms (Amendment) Act, 1969 and the Kerala Land Reforms (Amendment) Act, 1971. The petitioner contended that the amendments to the Constitution, particularly the 24th, 25th, and 29th Amendments, were beyond the amending power of Parliament. The Supreme Court, in a historic 7-6 decision, held that while Parliament has wide powers to amend the Constitution under Article 368, this power does not extend to altering the basic structure or framework of the Constitution. The basic structure doctrine holds that certain fundamental features of the Constitution — including supremacy of the Constitution, republican and democratic form of government, secular character, separation of powers, and federal character — cannot be destroyed through the amending process."
+  },
+  {
+    "id": 2,
+    "title": "Minerva Mills Ltd. v. Union of India",
+    "petitioner": "Minerva Mills Ltd.",
+    "respondent": "Union of India",
+    "year": 1980,
+    "citation": "AIR 1980 SC 1789",
+    "disposal": "Allowed (partly)",
+    "bench_size": 5,
+    "judges": "Y.V. Chandrachud · A.C. Gupta · N.L. Untwalia · P.S. Kailasam · O. Chinnappa Reddy",
+    "author": "Y.V. Chandrachud",
+    "case_type": "Constitutional",
+    "snippet": "Sections 4 and 55 of the 42nd Amendment are unconstitutional. <mark>Fundamental Rights</mark> and <mark>Directive Principles</mark> must coexist in harmony — one cannot be used to destroy the other.",
+    "segments": [
+      "The <mark>42nd Amendment</mark> removed judicial review of constitutional amendments — this strikes at the basic structure.",
+      "Harmony between <mark>Fundamental Rights</mark> and Directive Principles is itself an essential feature of the Constitution."
+    ],
+    "acts": ["Article 14", "Article 19", "Article 31", "42nd Amendment"],
+    "full_text": "Minerva Mills Ltd., a textile company in Karnataka, was nationalized under the Sick Textile Undertakings (Nationalisation) Act, 1974. The petitioners challenged this nationalization and also challenged the constitutional validity of sections 4 and 55 of the Constitution (42nd Amendment) Act, 1976. The Supreme Court struck down sections 4 and 55 of the 42nd Amendment. Section 4 had amended Article 31C to extend the protection from judicial review to all Directive Principles, while section 55 prevented any constitutional amendment from being questioned in court. The Court held that the balance between Fundamental Rights and Directive Principles is itself a basic feature of the Constitution."
+  },
+  {
+    "id": 3,
+    "title": "Indira Nehru Gandhi v. Raj Narain",
+    "petitioner": "Indira Nehru Gandhi",
+    "respondent": "Raj Narain",
+    "year": 1975,
+    "citation": "AIR 1975 SC 2299",
+    "disposal": "Allowed (appeal)",
+    "bench_size": 5,
+    "judges": "A.N. Ray · H.R. Khanna · K.K. Mathew · M.H. Beg · Y.V. Chandrachud",
+    "author": "H.R. Khanna",
+    "case_type": "Election Law",
+    "snippet": "The <mark>39th Amendment</mark> placing the Prime Minister's election beyond judicial review violates the basic structure. <mark>Free and fair elections</mark> are a fundamental constitutional imperative.",
+    "segments": [
+      "The <mark>39th Amendment</mark> ousting court jurisdiction over election disputes of high constitutional functionaries is void.",
+      "Democratic elections form part of the <mark>basic structure</mark> and cannot be abrogated by constitutional amendment."
+    ],
+    "acts": ["Representation of People Act", "Article 71", "39th Amendment"],
+    "full_text": "This case arose from the election petition filed by Raj Narain challenging the election of Indira Gandhi from the Rae Bareli constituency. The Allahabad High Court found Indira Gandhi guilty of corrupt practices and declared her election void. In response, the Parliament enacted the Constitution (39th Amendment) Act, 1975, which placed the election of the Prime Minister and Speaker beyond the scrutiny of courts. The Supreme Court struck down the amendment, holding that it violated the basic structure of the Constitution by destroying the principle of free and fair elections."
+  },
+  {
+    "id": 4,
+    "title": "S.R. Bommai v. Union of India",
+    "petitioner": "S.R. Bommai",
+    "respondent": "Union of India",
+    "year": 1994,
+    "citation": "AIR 1994 SC 1918",
+    "disposal": "Dismissed",
+    "bench_size": 9,
+    "judges": "S.R. Pandian · A.M. Ahmadi · Kuldip Singh · J.S. Verma · P.B. Sawant",
+    "author": "S.R. Pandian",
+    "case_type": "Federalism",
+    "snippet": "<mark>President's Rule</mark> under Article 356 is subject to judicial review. The floor of the House is the only test for majority. <mark>Secularism</mark> is a basic feature of the Constitution.",
+    "segments": [
+      "<mark>President's Rule</mark> cannot be imposed without giving the Chief Minister an opportunity to prove majority.",
+      "<mark>Secularism and federalism</mark> are integral parts of the basic structure — binding on every organ of State."
+    ],
+    "acts": ["Article 356", "Article 365", "Article 74"],
+    "full_text": "S.R. Bommai, the Chief Minister of Karnataka, challenged the dismissal of his government by the Governor of Karnataka under Article 356 of the Constitution. The Supreme Court laid down important guidelines regarding the invocation of President's Rule under Article 356. The Court held that the power under Article 356 is not absolute and is subject to judicial review. The Court established that the floor of the House is the only proper test for determining whether a government has lost majority. The judgment also declared secularism as a basic feature of the Constitution."
+  },
+  {
+    "id": 5,
+    "title": "I.C. Golaknath v. State of Punjab",
+    "petitioner": "I.C. Golaknath",
+    "respondent": "State of Punjab",
+    "year": 1967,
+    "citation": "AIR 1967 SC 1643",
+    "disposal": "Allowed",
+    "bench_size": 11,
+    "judges": "K. Subba Rao · K.N. Wanchoo · J.C. Shah · S.M. Sikri · R.S. Bachawat",
+    "author": "K. Subba Rao",
+    "case_type": "Fundamental Rights",
+    "snippet": "Parliament has no power to amend <mark>Part III</mark> of the Constitution to abridge <mark>Fundamental Rights</mark>. Such rights are transcendental and immutable in character.",
+    "segments": [
+      "<mark>Fundamental Rights</mark> are transcendental and immutable — they cannot be curtailed or abolished even by constitutional amendment.",
+      "Article 368 does not confer power to take away or abridge the <mark>fundamental rights</mark> guaranteed under Part III."
+    ],
+    "acts": ["Part III", "Article 13", "17th Amendment", "Article 368"],
+    "full_text": "The Golaknath family owned over 500 acres of farmland in Jalandhar, Punjab. Under the Punjab Security of Land Tenures Act, 1953, the state government declared some of this land as surplus. The family challenged this on the grounds that it violated their fundamental right to hold and dispose of property under Article 19(1)(f). The Supreme Court, by a majority of 6:5, held that Parliament had no power to amend Part III of the Constitution so as to take away or abridge the fundamental rights guaranteed therein. The Court declared that fundamental rights are given a transcendental position under the Constitution and are immutable."
+  },
+  {
+    "id": 6,
+    "title": "Maneka Gandhi v. Union of India",
+    "petitioner": "Maneka Gandhi",
+    "respondent": "Union of India",
+    "year": 1978,
+    "citation": "AIR 1978 SC 597",
+    "disposal": "Allowed",
+    "bench_size": 7,
+    "judges": "M.H. Beg · Y.V. Chandrachud · V.R. Krishna Iyer · P.N. Bhagwati · N.L. Untwalia · S. Murtaza Fazal Ali · P.S. Kailasam",
+    "author": "P.N. Bhagwati",
+    "case_type": "Fundamental Rights",
+    "snippet": "The right to travel abroad is part of <mark>personal liberty</mark> under Article 21. Any procedure depriving a person of life or liberty must be <mark>reasonable, fair and just</mark>.",
+    "segments": [
+      "<mark>Article 21</mark> does not merely guarantee life and liberty — it ensures that any deprivation follows a procedure that is fair, just and reasonable.",
+      "The passport authorities cannot impound a passport without giving the holder a <mark>hearing</mark> — principles of natural justice must be observed."
+    ],
+    "acts": ["Article 14", "Article 19", "Article 21", "Passport Act 1967"],
+    "full_text": "Maneka Gandhi's passport was impounded by the Government of India under the Passport Act, 1967, without providing reasons. She challenged this action as violative of her fundamental rights. The Supreme Court expanded the scope of Article 21 significantly, holding that the right to live includes the right to travel abroad. The Court held that the procedure established by law under Article 21 must be right, just and fair, and not arbitrary, fanciful or oppressive."
+  },
+  {
+    "id": 7,
+    "title": "Vishaka v. State of Rajasthan",
+    "petitioner": "Vishaka and Others",
+    "respondent": "State of Rajasthan",
+    "year": 1997,
+    "citation": "AIR 1997 SC 3011",
+    "disposal": "Allowed",
+    "bench_size": 3,
+    "judges": "J.S. Verma · Sujata V. Manohar · B.N. Kripal",
+    "author": "J.S. Verma",
+    "case_type": "Gender Justice",
+    "snippet": "<mark>Sexual harassment</mark> at the workplace violates fundamental rights under Articles 14, 19 and 21. Guidelines laid down to prevent, prohibit and redress <mark>workplace harassment</mark>.",
+    "segments": [
+      "<mark>Sexual harassment</mark> at workplace is a violation of the fundamental rights of gender equality and the right to life and liberty.",
+      "The Court laid down detailed <mark>Vishaka Guidelines</mark> to be followed by all employers until suitable legislation is enacted."
+    ],
+    "acts": ["Article 14", "Article 15", "Article 19(1)(g)", "Article 21"],
+    "full_text": "This PIL was filed by Vishaka and other women's groups following the gang-rape of a social worker Bhanwari Devi in Rajasthan. The Supreme Court noted the absence of any legislation to address sexual harassment at the workplace and laid down binding guidelines known as the Vishaka Guidelines. The guidelines defined sexual harassment, placed obligations on employers, and mandated the creation of complaints committees in all workplaces. These guidelines remained in force until the Sexual Harassment of Women at Workplace Act was enacted in 2013."
+  },
+  {
+    "id": 8,
+    "title": "A.K. Gopalan v. State of Madras",
+    "petitioner": "A.K. Gopalan",
+    "respondent": "State of Madras",
+    "year": 1950,
+    "citation": "AIR 1950 SC 27",
+    "disposal": "Dismissed",
+    "bench_size": 6,
+    "judges": "H.J. Kania · M. Patanjali Sastri · Mehr Chand Mahajan · S.R. Das · B.K. Mukherjea · Sudhi Ranjan Das",
+    "author": "H.J. Kania",
+    "case_type": "Preventive Detention",
+    "snippet": "Each <mark>Fundamental Right</mark> is a self-contained code. The <mark>Preventive Detention Act</mark> does not violate Article 21 if it follows the procedure established by law.",
+    "segments": [
+      "The court adopted a narrow interpretation — <mark>procedure established by law</mark> means any procedure enacted by legislature, not necessarily fair or just.",
+      "Each Article in Part III is <mark>mutually exclusive</mark> — violation of one right cannot be tested against another."
+    ],
+    "acts": ["Article 19", "Article 21", "Article 22", "Preventive Detention Act 1950"],
+    "full_text": "A.K. Gopalan, a Communist leader, was detained under the Preventive Detention Act, 1950. He challenged his detention as violative of fundamental rights under Articles 14, 19, 21 and 22. The Supreme Court, in one of its earliest constitutional decisions, held that preventive detention was not violative of Article 21 as long as the procedure prescribed by the enacted law was followed. The Court adopted a narrow interpretation of 'procedure established by law' and held that each fundamental right was a self-contained code, not requiring cross-reference to other rights."
+  }
+]
